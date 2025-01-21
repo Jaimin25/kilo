@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "stdio.h": "c",
+        "unistd.h": "c",
+        "ctype.h": "c",
+        "termios.h": "c",
+        "stdlib.h": "c",
+        "features.h": "c"
+    }
+}
