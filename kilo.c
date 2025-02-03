@@ -289,6 +289,29 @@ void editorAppendRow(char *s, size_t len)
     E.numrows++;
 }
 
+void editorRowInsertChar(erow *row, int at, int c)
+{
+    if (at < 0 || at > row->size)
+        at = row->size;
+    row->chars = realloc(row->chars, row->size + 2);
+    memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+    row->size++;
+    row->chars[at] = c;
+    editorUpdateRow(row);
+}
+
+// EDITOR OPERATIONS
+
+void editorInsertChar(int c)
+{
+    if (E.cy == E.numrows)
+    {
+        editorAppendRow("", 0);
+    }
+    editorRowInsertChar(&E.row[E.cy], E.cx, c);
+    E.cx++;
+}
+
 /* FILE I/O */
 
 void editorOpen(char *filename)
@@ -469,7 +492,6 @@ void editorRefreshScreen()
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.cx - E.coloff) + 1);
     abAppend(&ab, buf, strlen(buf));
 
-    abAppend(&ab, "\x1b[H", 3);
     abAppend(&ab, "\x1b[?25h", 6);
 
     write(STDOUT_FILENO, ab.b, ab.len);
@@ -588,6 +610,10 @@ void editorProcessKeypress()
     case ARROW_LEFT:
     case ARROW_RIGHT:
         editorMoveCursor(c);
+        break;
+
+    default:
+        editorInsertChar(c);
         break;
     }
 }
