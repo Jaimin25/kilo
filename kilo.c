@@ -1,4 +1,4 @@
-/*** includes ***/
+s /*** includes ***/
 
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
@@ -21,22 +21,22 @@
 
 #define KILO_VERSION "0.0.1"
 #define KILO_TAB_STOP 8
+#define KILO_QUIT_TIMES 3
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-enum editorKey
-{
-    BACKSPACE = 127,
-    ARROW_LEFT = 1000,
-    ARROW_RIGHT,
-    ARROW_UP,
-    ARROW_DOWN,
-    DEL_KEY,
-    HOME_KEY,
-    END_KEY,
-    PAGE_UP,
-    PAGE_DOWN
-};
+    enum editorKey {
+        BACKSPACE = 127,
+        ARROW_LEFT = 1000,
+        ARROW_RIGHT,
+        ARROW_UP,
+        ARROW_DOWN,
+        DEL_KEY,
+        HOME_KEY,
+        END_KEY,
+        PAGE_UP,
+        PAGE_DOWN
+    };
 
 /* DATA */
 
@@ -627,6 +627,8 @@ void editorMoveCursor(int key)
 
 void editorProcessKeypress()
 {
+    static int quit_times = KILO_QUIT_TIMES;
+
     int c = editorReadKey();
 
     switch (c)
@@ -634,6 +636,12 @@ void editorProcessKeypress()
     case '\r':
         break;
     case CTRL_KEY('q'):
+        if (E.dirty && quit_times > 0)
+        {
+            editorSetStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q %d more times to quit. ", quit_times);
+            quit_times--;
+            return;
+        }
         write(STDOUT_FILENO, "\x1b[2J", 4);
         write(STDOUT_FILENO, "\x1b[H", 3);
         exit(0);
@@ -696,6 +704,8 @@ void editorProcessKeypress()
         editorInsertChar(c);
         break;
     }
+
+    quit_times = KILO_QUIT_TIMES;
 }
 
 void initEditor()
