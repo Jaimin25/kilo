@@ -540,7 +540,6 @@ void editorFindCallback(char *query, int key)
 {
     static int last_match = -1;
     static int direction = 1;
-
     if (key == '\r' || key == '\x1b')
     {
         last_match = -1;
@@ -560,7 +559,6 @@ void editorFindCallback(char *query, int key)
         last_match = -1;
         direction = 1;
     }
-
     if (last_match == -1)
         direction = 1;
     int current = last_match;
@@ -572,7 +570,7 @@ void editorFindCallback(char *query, int key)
             current = E.numrows - 1;
         else if (current == E.numrows)
             current = 0;
-        erow *row = &E.row[i];
+        erow *row = &E.row[current];
         char *match = strstr(row->render, query);
         if (match)
         {
